@@ -1,14 +1,15 @@
 # MTP_t4
 
-MTP Responder for Teensy 4.0 and T3.x
+MTP Responder for Teensy 4.1 SPIFFS File System
 
-needs Bill Greiman`s SdFat-beta https://github.com/greiman/SdFat-beta to support both Teensy 4.0 and ExFAT filesystems
+NOTE: Until core is changed you will need to modify usb.c:
+function: usb_transfer_status
+changed #if 0 to #if 1
+
  
 code is based on https://github.com/yoonghm/MTP with modification by WMXZ
 
 see also https://forum.pjrc.com/threads/43050-MTP-Responder-Contribution for discussions
-
-files in different copy-to directories contain modifications of cores and need to be copied to cores/teensy4, cores/teensy3 and hardware/avr, respectively. These files are only necessary until Teensyduino has integrated full MTP into cores functionality
 
 needs USB2 https://github.com/WMXZ-EU/USB2 for T4.0. (uses here usb1.h and usb1.c)
 

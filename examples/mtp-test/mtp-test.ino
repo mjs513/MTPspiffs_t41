@@ -24,11 +24,7 @@ void setup()
   if(!Storage_init()) {Serial.println("No storage"); while(1);};
 
   Serial.println("MTP test");
-
-#if USE_SDIO==1
   pinMode(13,OUTPUT);
-#endif
-
 }
 
 void loop()
