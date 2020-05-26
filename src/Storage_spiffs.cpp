@@ -29,7 +29,12 @@
 #include "spiffs_t4.h"
 #include "spiffs.h"
 
-  #include "Storage_spiffs.h"
+#include "Storage_spiffs.h"
+
+extern "C" {
+  extern uint8_t external_psram_size;
+}
+
   uint32_t flash_free, flash_available, flash_used;
   
   spiffs_t4 eFLASH;
@@ -40,17 +45,23 @@
     #endif
     if (eFLASH.begin() < 0) {
 		return false;
-		//sd.errorHalt("sd.begin failed");
 	} else {
 		eFLASH.fs_mount();
-		eFLASH.fs_listDir();
 		return true;
 	}
-
 	return 1;
-
   }
-
+  
+  void initializeStorage(void)
+  {
+	eFLASH.fs_unmount();
+	if (external_psram_size == 16) {
+		eFLASH.eraseDevice();
+	} else {
+		eFLASH.eraseFlashChip();
+	}
+	eFLASH.fs_mount();
+  }
 
 // TODO:
 //   support multiple storages
@@ -113,7 +124,7 @@ void mtp_lock_storage(bool lock) {}
   { 
     if(index_ > 0) return;// only once
     mtp_lock_storage(true);
-	int res = eFLASH.f_open(index_, "mtpindex.dat", SPIFFS_CREAT | SPIFFS_RDWR );
+	eFLASH.f_open(index_, "mtpindex.dat", SPIFFS_CREAT | SPIFFS_RDWR );
     mtp_lock_storage(false);
   }
 
@@ -122,7 +133,7 @@ void mtp_lock_storage(bool lock) {}
     OpenIndex();
     mtp_lock_storage(true);
 	eFLASH.f_seek(index_, sizeof(r) * i, SPIFFS_SEEK_SET);
-	int res = eFLASH.f_write(index_, (char*)&r, sizeof(r));
+	eFLASH.f_write(index_, (char*)&r, sizeof(r));
     mtp_lock_storage(false);
   }
 
@@ -137,7 +148,6 @@ void mtp_lock_storage(bool lock) {}
   Record MTPStorage_SPIFFS::ReadIndexRecord(uint32_t i) 
   {
     Record ret;
-	int res;
 
     if (i > index_entries_) 
     { memset(&ret, 0, sizeof(ret));
@@ -145,8 +155,8 @@ void mtp_lock_storage(bool lock) {}
     }
     OpenIndex();
     mtp_lock_storage(true);
-	res = eFLASH.f_seek(index_, sizeof(ret) * i, SPIFFS_SEEK_SET);
-	res = eFLASH.f_read(index_, (char *)&ret, sizeof(ret));
+	eFLASH.f_seek(index_, sizeof(ret) * i, SPIFFS_SEEK_SET);
+	eFLASH.f_read(index_, (char *)&ret, sizeof(ret));
     mtp_lock_storage(false);
     return ret;
   }
@@ -173,7 +183,7 @@ void mtp_lock_storage(bool lock) {}
     ConstructFilename(i, filename, 256);
     mtp_lock_storage(true);
 	if(file_) eFLASH.f_close(file_);
-	int res = eFLASH.f_open(file_, filename, mode);
+	eFLASH.f_open(file_, filename, mode);
     open_file_ = i;
     mode_ = mode;
     mtp_lock_storage(false);
@@ -396,8 +406,7 @@ void mtp_lock_storage(bool lock) {}
   void MTPStorage_SPIFFS::write(const char* data, uint32_t bytes)
   {
       mtp_lock_storage(true);
-      //file_.write(data,bytes);
-	  int res = eFLASH.f_write(file_, data, bytes);
+	  eFLASH.f_write(file_, data, bytes);
       mtp_lock_storage(false);
 	  fileSize = bytes;
   }

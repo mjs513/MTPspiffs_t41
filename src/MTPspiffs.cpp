@@ -598,11 +598,11 @@
       data_buffer_ = NULL;                                \
     } while(0)
 
-    #define printContainer() {   printf("%x %d %d %d: %x %x %x\n", \
+    #define printContainer() {	printf("%x %d %d %d: %x %x %x\n", \
                 CONTAINER->op, CONTAINER->len, CONTAINER->type, CONTAINER->transaction_id, \
-                CONTAINER->params[0], CONTAINER->params[1], CONTAINER->params[2]);  }
-
-
+                CONTAINER->params[0], CONTAINER->params[1], CONTAINER->params[2]);
+				}
+				
   void MTPD::read(char* data, uint32_t size) 
   {
     while (size) {
@@ -946,10 +946,13 @@
       }                                                   \
     } while(0)
 
-
-    #define printContainer() {   printf("%x %d %d %d: %x %x %x\n", \
+	#if 0
+    #define printContainer() { printf("%x %d %d %d: %x %x %x\n", \
                 CONTAINER->op, CONTAINER->len, CONTAINER->type, CONTAINER->transaction_id, \
-                CONTAINER->params[0], CONTAINER->params[1], CONTAINER->params[2]);  }
+                CONTAINER->params[0], CONTAINER->params[1], CONTAINER->params[2]); }
+	#else
+		#define printContainer() {}
+	#endif
 
 
     void MTPD::read(char* data, uint32_t size) 

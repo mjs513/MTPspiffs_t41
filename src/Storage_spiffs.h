@@ -33,7 +33,8 @@
 #include "spiffs.h"
 
   bool Storage_init(void);
-
+  void initializeStorage(void);
+  
 // This interface lets the MTP responder interface any storage.
 // We'll need to give the MTP responder a pointer to one of these.
 class MTPStorageInterface : public spiffs_t4
